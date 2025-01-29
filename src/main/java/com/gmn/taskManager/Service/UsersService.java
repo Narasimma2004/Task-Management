@@ -5,13 +5,11 @@ import com.gmn.taskManager.Entity.Users;
 import com.gmn.taskManager.Repository.UsersRepository;
 import com.gmn.taskManager.Response.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class UsersService {
@@ -67,5 +65,17 @@ public class UsersService {
     }
 
     public ResponseEntity<LoginResponse> login(LoginDTO loginDTO) {
+        Users users=usersRepository.findByEMail(loginDTO.geteMail());
+        if(users!=null)
+        {
+            String rawPassword= loginDTO.getPassword();
+            String enCoded = usersRepository.findByEMail(loginDTO.geteMail()).getPassword();
+            if(bCryptPasswordEncoder.matches(rawPassword,enCoded))
+            {
+                return ResponseEntity.ok(new LoginResponse(true,"Login Successfully",users));
+            }
+            return ResponseEntity.ok(new LoginResponse(false,"Password Mismatch",null));
+        }
+        return ResponseEntity.ok(new LoginResponse(false,"Invalid Mail",null));
     }
 }
