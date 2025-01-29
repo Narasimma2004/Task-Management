@@ -1,5 +1,6 @@
 package com.gmn.taskManager.Service;
 
+import com.gmn.taskManager.DTO.LoginDTO;
 import com.gmn.taskManager.Entity.Users;
 import com.gmn.taskManager.Repository.UsersRepository;
 import com.gmn.taskManager.Response.LoginResponse;
@@ -63,5 +64,8 @@ public class UsersService {
             return ResponseEntity.ok(new LoginResponse(false, "Unauthorized", null));
         }
 
+    }
+
+    public ResponseEntity<LoginResponse> login(LoginDTO loginDTO) {
     }
 }

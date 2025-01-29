@@ -1,5 +1,6 @@
 package com.gmn.taskManager.Controller;
 
+import com.gmn.taskManager.DTO.LoginDTO;
 import com.gmn.taskManager.Entity.Users;
 import com.gmn.taskManager.Response.LoginResponse;
 import com.gmn.taskManager.Service.UsersService;
@@ -26,5 +27,11 @@ public class UsersController {
     public ResponseEntity<LoginResponse> addUser(@RequestBody Users users)
     {
         return usersService.addUser(users);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginDTO loginDTO)
+    {
+        return usersService.login(loginDTO);
     }
 }
