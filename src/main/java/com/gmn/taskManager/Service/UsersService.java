@@ -3,10 +3,14 @@ package com.gmn.taskManager.Service;
 import com.gmn.taskManager.DTO.LoginDTO;
 import com.gmn.taskManager.Entity.Users;
 import com.gmn.taskManager.Repository.UsersRepository;
+import com.gmn.taskManager.Response.JWTResponse;
 import com.gmn.taskManager.Response.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +23,12 @@ public class UsersService {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    JWTService jwtService;
 
     BCryptPasswordEncoder bCryptPasswordEncoder=new BCryptPasswordEncoder(12);
 
@@ -64,18 +74,18 @@ public class UsersService {
 
     }
 
+
     public ResponseEntity<LoginResponse> login(LoginDTO loginDTO) {
-        Users users=usersRepository.findByEMail(loginDTO.geteMail());
-        if(users!=null)
-        {
-            String rawPassword= loginDTO.getPassword();
-            String enCoded = usersRepository.findByEMail(loginDTO.geteMail()).getPassword();
-            if(bCryptPasswordEncoder.matches(rawPassword,enCoded))
-            {
-                return ResponseEntity.ok(new LoginResponse(true,"Login Successfully",users));
-            }
-            return ResponseEntity.ok(new LoginResponse(false,"Password Mismatch",null));
+        Users users = usersRepository.findByEMail(loginDTO.geteMail());
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(users.getName(),loginDTO.getPassword()));
+
+
+        if(authentication.isAuthenticated()) {
+            String accessToken = jwtService.generateToken(users.getName());
+            String refreshToken = jwtService.generateRefreshToken(users.getName());
+
+            return ResponseEntity.ok(new LoginResponse(true, "Login Successfully", new JWTResponse(accessToken, refreshToken)));
         }
-        return ResponseEntity.ok(new LoginResponse(false,"Invalid Mail",null));
+        return ResponseEntity.ok(new LoginResponse(false,"UnAuthorized",null));
     }
 }

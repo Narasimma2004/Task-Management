@@ -6,12 +6,12 @@ public class LoginResponse {
 
     boolean status;
     String message;
-    Users users;
+    Object users;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(boolean status, String message, Users users) {
+    public LoginResponse(boolean status, String message, Object users) {
         this.status = status;
         this.message = message;
         this.users = users;
@@ -33,7 +33,7 @@ public class LoginResponse {
         this.message = message;
     }
 
-    public Users getUsers() {
+    public Object getUsers() {
         return users;
     }
 
